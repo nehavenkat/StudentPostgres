@@ -3,6 +3,23 @@ const db = require("../../../db")
 
 const router = express.Router()
 
+// Here we can get only LIMIT and OFFSET 
+//In POSTMAN Check /sdtudents/?limit=2&offset=1
+router.get('/',async(req,res) => {
+let query = "SELECT * FROM student"
+
+  try {
+    const students = await db.query(`SELECT * FROM student LIMIT $1 OFFSET $2`,[req.query.limit,req.query.offset])
+    res.send(students.rows)
+}
+catch (ex) {
+    res.status(500).send(ex)
+}
+})
+//For Sort we use in PG "SELECT * FROM student WHERE name='neha' ORDER BY name desc LIMIT 1 OFFSET 2"
+
+// Here we can get both LIMIT and OFFSET and SORT
+//In POSTMAN check with /students/?limit=1&offset=1&name=neha/sort=desc
 router.get("/", async (req, res) => {
     let query = "SELECT * FROM student";
     const limit = req.query.limit; 
@@ -28,7 +45,7 @@ router.get("/", async (req, res) => {
         query += ' LIMIT $1 OFFSET $2' 
 
     try {
-        const  = await db.query(query, params)
+        const students = await db.query(query, params)
         res.send(students.rows)
     }
     catch (ex) {
